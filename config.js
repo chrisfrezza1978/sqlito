@@ -22,6 +22,6 @@
 window.MENTA_CONFIG = {
   modo: 'auto',
   api: '',
-  celular: 'avisar',
+  celular: 'liberar',
   larguraMinima: 1024
 };
