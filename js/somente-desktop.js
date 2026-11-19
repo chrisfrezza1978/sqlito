@@ -1,11 +1,17 @@
 /* =====================================================================
    SQLito — acesso exclusivo em computadores (desktop)
    ---------------------------------------------------------------------
-   Roda antes do app. Em celular ou tablet, mostra uma tela explicando
-   que o curso é para computador e o app não é iniciado
-   (window.MENTA_DESKTOP_OK = false). Para desligar: somenteDesktop:false
-   no config.js. O servidor faz a mesma verificação (somente_desktop no
-   config.ini) e entrega frontend/somente-desktop.html.
+   Roda antes do app. O que acontece em celular/tablet depende de
+   MENTA_CONFIG.celular (config.js):
+     'bloquear' → tela "exclusivo para computadores"; o app não inicia
+                  (window.MENTA_DESKTOP_OK = false).
+     'avisar'   → mesma tela, com o botão "Continuar mesmo assim"; a
+                  escolha fica salva no navegador e o app abre no layout
+                  de celular.
+     'liberar'  → abre direto, sem aviso.
+   (Compatível com a opção antiga somenteDesktop: true = 'bloquear',
+   false = 'liberar'.) No servidor (caminho completo), o bloqueio por
+   User-Agent é controlado por somente_desktop no config.ini.
    ===================================================================== */
 (function (raiz) {
   'use strict';
@@ -31,6 +37,18 @@
     return '';
   }
 
+  /** 'bloquear' | 'avisar' | 'liberar' */
+  function politica(c) {
+    c = c || cfg;
+    if (c.celular === 'bloquear' || c.celular === 'avisar' || c.celular === 'liberar') return c.celular;
+    if (c.somenteDesktop === false) return 'liberar';
+    if (c.somenteDesktop === true) return 'bloquear';
+    return 'avisar';
+  }
+  var CHAVE_OK = 'hm.celular.continuar';
+  function lerOk() { try { return raiz.localStorage.getItem(CHAVE_OK) === '1'; } catch (e) { return false; } }
+  function gravarOk() { try { raiz.localStorage.setItem(CHAVE_OK, '1'); } catch (e) { /* sem armazenamento */ } }
+
   var TEXTO = {
     celular: 'Você está num celular.',
     tablet: 'Você está num tablet.',
@@ -38,7 +56,7 @@
     tela: 'A tela deste aparelho é pequena demais para o curso.'
   };
 
-  function mostrar(m) {
+  function mostrar(m, avisar) {
     var url = String(raiz.location ? raiz.location.href : '').split('#')[0];
     var st = document.createElement('style');
     st.textContent =
@@ -51,21 +69,27 @@
       '#soDesktop .m{color:#3E6B5C;margin:0 0 14px}' +
       '#soDesktop .u{display:block;word-break:break-all;background:#F2FAF6;border:2px dashed #3EB489;border-radius:14px;padding:10px 12px;font:700 15px "JetBrains Mono",ui-monospace,monospace;margin:10px 0 14px}' +
       '#soDesktop button{min-height:50px;width:100%;border:0;border-radius:16px;background:#3EB489;color:#fff;font-weight:900;font-size:16px;font-family:inherit;box-shadow:0 4px 0 #2A8C67;cursor:pointer}' +
-      '#soDesktop ul{text-align:left;color:#3E6B5C;padding-left:20px;margin:16px 0 0;font-size:15px}';
+      '#soDesktop ul{text-align:left;color:#3E6B5C;padding-left:20px;margin:16px 0 0;font-size:15px}' +
+      '#soDesktop .seguir{margin-top:10px;background:#fff;color:#2A8C67;border:2px solid #3EB489;box-shadow:none}';
     document.head.appendChild(st);
     var d = document.createElement('main');
     d.id = 'soDesktop';
     d.setAttribute('role', 'alert');
     d.innerHTML =
       '<div class="c"><img src="icone.svg" alt="SQLito, mascote do SQLito">' +
-      '<h1>O SQLito é exclusivo para computadores</h1>' +
-      '<p class="m">' + (TEXTO[m] || '') + ' Abra este endereço no navegador do seu computador (Chrome, Edge ou Firefox):</p>' +
+      (avisar ? '<h1>O SQLito fica melhor no computador</h1>' +
+        '<p class="m">' + (TEXTO[m] || '') + ' Dá para estudar por aqui, mas o laboratório e os exercícios de escrever SQL são bem mais confortáveis com teclado e tela grande. Para abrir no computador, use este endereço:</p>'
+      : '<h1>O SQLito é exclusivo para computadores</h1>' +
+        '<p class="m">' + (TEXTO[m] || '') + ' Abra este endereço no navegador do seu computador (Chrome, Edge ou Firefox):</p>') +
       '<span class="u" id="sdUrl"></span>' +
       '<button type="button" id="sdCopiar">Copiar link</button>' +
+      (avisar ? '<button type="button" id="sdSeguir" class="seguir">Continuar mesmo assim</button>' : '') +
       '<ul><li>Os exercícios usam editor de SQL, diagramas do banco e tabelas de resultado que precisam de tela grande.</li>' +
       '<li>Teclado e mouse deixam as consultas muito mais rápidas (Ctrl+Enter executa).</li></ul></div>';
     document.body.appendChild(d);
     document.getElementById('sdUrl').textContent = url;
+    var seguir = document.getElementById('sdSeguir');
+    if (seguir) seguir.onclick = function () { gravarOk(); raiz.location.reload(); };
     document.getElementById('sdCopiar').onclick = function () {
       var b = this;
       var ok = function () { b.textContent = 'Link copiado! Cole no computador'; };
@@ -74,13 +98,19 @@
     };
   }
 
-  raiz.MENTA_DESKTOP = { motivo: motivo };
+  raiz.MENTA_DESKTOP = { motivo: motivo, politica: politica };
   if (typeof document === 'undefined') return;   // testes em Node
-  var m = cfg.somenteDesktop === false ? '' : motivo();
-  raiz.MENTA_DESKTOP_OK = !m;
+  var pol = politica();
+  var m = motivo();
+  raiz.MENTA_CELULAR = pol;
+  raiz.MENTA_E_CELULAR = !!m;                    // usado pelo app para textos ("toque" x "clique")
+  if (pol === 'bloquear') document.documentElement.classList.add('exige-pc');   // aviso de janela estreita
+  if (m) document.documentElement.classList.add('celular');
+  var bloqueia = m && (pol === 'bloquear' || (pol === 'avisar' && !lerOk()));
+  raiz.MENTA_DESKTOP_OK = !bloqueia;
   raiz.MENTA_DESKTOP_MOTIVO = m;
-  if (!m) return;
+  if (!bloqueia) return;
   document.documentElement.classList.add('so-desktop');
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { mostrar(m); });
-  else mostrar(m);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { mostrar(m, pol === 'avisar'); });
+  else mostrar(m, pol === 'avisar');
 })(typeof window !== 'undefined' ? window : globalThis);
