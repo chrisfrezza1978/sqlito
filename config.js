@@ -19,6 +19,6 @@
 window.MENTA_CONFIG = {
   modo: 'demo',
   api: '',
-  somenteDesktop: false,
+  somenteDesktop: True,
   larguraMinima: 1024
 };
