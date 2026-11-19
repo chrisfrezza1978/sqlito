@@ -13,12 +13,15 @@
            entrega o front end e a API juntos — o caso do Render).
      'https://sqlito.onrender.com' → API em outro endereço (libere
            este site em cors_origens / HM_CORS_ORIGENS no servidor).
-   somenteDesktop: true bloqueia celulares e tablets.
-   larguraMinima:  menor tela (px) aceita em aparelhos com toque.
+   celular: o que fazer em celulares e tablets
+     'bloquear' → só computador (tela "exclusivo para computadores")
+     'avisar'   → recomenda o computador, com "Continuar mesmo assim"
+     'liberar'  → abre direto no layout de celular
+   larguraMinima:  menor tela (px) aceita como computador em aparelhos com toque.
    ===================================================================== */
 window.MENTA_CONFIG = {
-  modo: 'demo',
+  modo: 'auto',
   api: '',
-  somenteDesktop: True,
+  celular: 'avisar',
   larguraMinima: 1024
 };
