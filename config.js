@@ -20,7 +20,7 @@
    larguraMinima:  menor tela (px) aceita como computador em aparelhos com toque.
    ===================================================================== */
 window.MENTA_CONFIG = {
-  modo: 'auto',
+  modo: 'demo',
   api: '',
   celular: 'liberar',
   larguraMinima: 1024
