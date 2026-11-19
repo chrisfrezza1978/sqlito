@@ -559,7 +559,9 @@ tr.sob td{background:var(--bad-l)}tr.fal td{background:light-dark(#FFF1C9,#3A301
 #janelaPequena{display:none;position:fixed;inset:0;z-index:200;background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px;text-align:center}
 #janelaPequena div{max-width:420px;background:var(--card);border:2px solid var(--line);border-radius:20px;padding:22px}
 #janelaPequena b{font-size:20px;font-weight:900}#janelaPequena p{color:var(--mute);margin:8px 0 0}
-@media(max-width:959px){#janelaPequena{display:flex}}
+@media(max-width:959px){html.exige-pc #janelaPequena{display:flex}}
+/* conta no celular: só a foto no cabeçalho, menu na largura da tela */
+@media(max-width:600px){.contab{padding:3px}.contab .nm,.contab .seta{display:none}.cmenu{position:fixed;left:10px;right:10px;top:62px;width:auto;max-height:calc(100vh - 80px);overflow:auto}}
 @media(min-width:960px){
  body{padding-bottom:28px;padding-left:228px}
  .top{margin-left:-228px}
@@ -1188,7 +1190,7 @@ function desenharPerguntaEnt(){
  $('#enTab').onclick=()=>schema();
  $('#enX').onclick=()=>confirmarSaidaEnt();$('#enFim').onclick=()=>confirmarFimEnt();
  $('#enPular').onclick=()=>irParaEnt(proximaPendenteEnt(s.i));
- $('#enEnv').onclick=async()=>{const txt=ed.value.trim();if(!txt){toast('Escreva uma resposta ou clique em Pular.');return}
+ $('#enEnv').onclick=async()=>{const txt=ed.value.trim();if(!txt){toast(`Escreva uma resposta ou ${clq} em Pular.`);return}
   contarTempoEnt();r.sql=ed.value;const q={k:'code',a:p.a,check:p.check,setup:p.setup,must:p.must},v=await evalCode(q,txt);r.enviada=true;r.correta=!!v.ok;r.cmp=v.cmp||null;r.err=v.err||'';tone([[480,0,.05]]);
   const prox=proximaPendenteEnt(s.i);if(prox<0)terminarEntrevista(false);else irParaEnt(prox)};
  document.querySelectorAll('[data-eq]').forEach(b=>b.onclick=()=>irParaEnt(+b.dataset.eq));
@@ -1473,10 +1475,10 @@ function svgER(T,L){
 function viewDB(){
  const T=TRI(S.trilha),dados=labDados(),txt=dados.draft!=null?dados.draft:(MotorSQL.BANCOS[S.trilha].lab||'SELECT * FROM '+(TABLES[0]||['clientes'])[0]+';');
  return `<button class="lnk" id="dbBack">${ic('map')}Voltar à trilha</button><h1 class="h1">Laboratório — ${T.nome}</h1>
- <p class="mute">Aqui nada vale ponto. As alterações (INSERT, CREATE TABLE, procedures…) ficam guardadas enquanto o app estiver aberto, como numa janela de consulta do SQL Server. Para voltar aos dados originais, clique em Reiniciar banco.</p>
+ <p class="mute">Aqui nada vale ponto. As alterações (INSERT, CREATE TABLE, procedures…) ficam guardadas enquanto o app estiver aberto, como numa janela de consulta do SQL Server. Para voltar aos dados originais, ${clq} em Reiniciar banco.</p>
  <div class="lab-tabs" role="tablist"><button role="tab" data-lm="diag" aria-selected="${LAB.modo==='diag'}">${ic('db')}Diagrama</button><button role="tab" data-lm="lista" aria-selected="${LAB.modo==='lista'}">${ic('list')}Lista</button><span class="lab-zoom" ${LAB.modo==='diag'?'':'hidden'}><button class="lnk" data-z="-1" aria-label="Diminuir">−</button><button class="lnk" data-z="0" aria-label="Ajustar à tela">Ajustar</button><button class="lnk" data-z="1" aria-label="Aumentar">+</button></span></div>
  <div id="erBox" class="er ${LAB.modo==='diag'?'':'lista'}"><p class="cap" style="padding:16px">Carregando o banco…</p></div>
- <p class="cap">${ic('bulb')} Clique numa tabela para ver colunas e relacionamentos. No diagrama, cada linha liga a chave estrangeira (N) à chave primária (1).</p>
+ <p class="cap">${ic('bulb')} ${CLQ} numa tabela para ver colunas e relacionamentos. No diagrama, cada linha liga a chave estrangeira (N) à chave primária (1).</p>
  <div id="erDet"></div>
  <h2 class="h2">Editor</h2>
  <textarea class="ed" id="sb" style="min-height:170px" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Consulta do laboratório">${esc(txt)}</textarea>
@@ -1510,7 +1512,7 @@ function detalhe(n){
  const rels=t.fks.map(f=>{const p=LAB.meta.find(x=>x.nome.toLowerCase()===String(f.tab).toLowerCase());const pk=f.para||(p&&(p.cols.find(c=>c.pk)||{}).n)||'id';return{txt:`${t.nome}.${f.de} → ${f.tab}.${pk}`,sql:joinSQL(t.nome,f.de,f.tab,pk)}})
   .concat(filhos.map(({o,f})=>{const pk=f.para||(t.cols.find(c=>c.pk)||{}).n||'id';return{txt:`${o.nome}.${f.de} → ${t.nome}.${pk}`,sql:joinSQL(o.nome,f.de,t.nome,pk)}}));
  box.innerHTML=`<div class="card er-card"><div class="er-h"><div><h3>${esc(t.nome)}</h3><p class="mute">${esc(t.desc)} · ${pl(t.linhas,'linha')} · ${pl(t.cols.length,'coluna')}</p></div><button class="lnk" id="erX" aria-label="Fechar detalhes">${ic('x')}</button></div>
- <p class="cap">Clique numa coluna para inserir o nome no editor.</p><div class="er-cols">${t.cols.map(c=>`<button class="chip" data-ins="${esc(c.n)}" title="${esc(c.ty)}">${c.pk?'🔑 ':t.fks.some(f=>f.de.toLowerCase()===c.n.toLowerCase())?'🔗 ':''}${esc(c.n)} <small>${esc(c.ty.toLowerCase())}${c.nn&&!c.pk?' · not null':''}</small></button>`).join('')}</div>
+ <p class="cap">${CLQ} numa coluna para inserir o nome no editor.</p><div class="er-cols">${t.cols.map(c=>`<button class="chip" data-ins="${esc(c.n)}" title="${esc(c.ty)}">${c.pk?'🔑 ':t.fks.some(f=>f.de.toLowerCase()===c.n.toLowerCase())?'🔗 ':''}${esc(c.n)} <small>${esc(c.ty.toLowerCase())}${c.nn&&!c.pk?' · not null':''}</small></button>`).join('')}</div>
  ${rels.length?`<h4>Relacionamentos</h4><div class="er-rel">${rels.map((r,i)=>`<button class="hi" data-js="${i}"><code>${esc(r.txt)}</code><span>Montar JOIN</span></button>`).join('')}</div>`:'<p class="cap">Esta tabela não tem relacionamentos (chaves estrangeiras).</p>'}
  <div class="row"><button class="btn ghost" id="erVer">${ic('table')}Ver dados</button><button class="btn ghost" id="erCnt">${ic('chart')}Contar linhas</button></div></div>`;
  box.querySelectorAll('[data-ins]').forEach(b=>b.onclick=()=>inserirNoEditor(b.dataset.ins));
@@ -1568,7 +1570,7 @@ const licoesDoNivel=N=>ALL.filter(x=>x.ui+1>=N.et[0]&&x.ui+1<=N.et[1]);
 const etapasTxt=N=>{const n=UNITS.slice(N.et[0]-1,N.et[1]).map(u=>u.name);return n.length>1?n.slice(0,-1).join(', ')+' e '+n[n.length-1]:n[0]};
 const nota=v=>(+v).toFixed(1).replace('.',',');
 const dataBR=iso=>new Date(iso).toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'});
-const DEV='Computador';   // versão exclusiva para desktop
+const DEV=window.MENTA_E_CELULAR?'Celular':'Computador';
 const uuid=()=>{const b=crypto.getRandomValues(new Uint8Array(16));b[6]=b[6]&15|64;b[8]=b[8]&63|128;const h=Array.from(b,x=>x.toString(16).padStart(2,'0')).join('');return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`};
 function validarCadastro(b){
  const nome=String(b.nome||'').trim().replace(/\s+/g,' ');
@@ -1581,6 +1583,7 @@ function validarCadastro(b){
 }
 
 /* ---------- cliente da API (servidor Python) ---------- */
+const TOQ=window.MENTA_E_CELULAR,CLQ=TOQ?'Toque':'Clique',clq=TOQ?'toque':'clique';   // textos conforme o aparelho
 const CFG=window.MENTA_CONFIG||{},BASE=String(CFG.api||'').replace(/\/+$/,'');   // config.js: servidor da API (vazio = mesmo endereço)
 const API={mode:'demo',banco:null,token:LS.get('hm.token',null),
  async init(){if(CFG.modo==='demo')return;try{const c=new AbortController();const t=setTimeout(()=>c.abort(),CFG.modo==='servidor'||BASE?60000:6000);const r=await fetch(BASE+'/api/saude',{cache:'no-store',signal:c.signal});clearTimeout(t);const d=await r.json();if(r.ok&&d&&d.ok){this.mode='api';this.banco=d.banco}}catch(e){}},
@@ -1712,7 +1715,7 @@ function showAuth(modo,erro=''){
  ${cad?'<label class="chk"><input type="checkbox" id="fAce"><span>Li e aceito os termos de uso e a política de privacidade. O e-mail serve só para o login; no ranking aparece apenas o apelido.</span></label>':''}
  <div class="ferr" id="ferr" role="alert">${esc(erro)}</div>
  <button class="btn wide" id="fGo" type="submit">${cad?'Criar minha conta':'Entrar'}</button></form>
- <p class="cap" style="text-align:center;margin-top:14px">${cad?'Já tem conta? Clique em Entrar, lá em cima.':'Primeira vez aqui? Clique em Criar conta.'}</p>
+ <p class="cap" style="text-align:center;margin-top:14px">${cad?`Já tem conta? ${CLQ} em Entrar, lá em cima.`:`Primeira vez aqui? ${CLQ} em Criar conta.`}</p>
  </div></section></div>`;
  a.scrollTop=0;
  a.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>showAuth(b.dataset.m));
@@ -1889,7 +1892,7 @@ async function finishProva(){
  L.step='enviando';const N=NIVEIS[L.nivel-1],sec=Math.round((Date.now()-L.t0)/1000);bar();
  lb().innerHTML=`<div class="fin">${sqlito(evo(),'idle')}<h2 style="color:var(--ink)">Corrigindo sua prova…</h2></div>`;foot('','','Aguarde',true);
  try{L.result=await API.req('POST','provas',{client_id:L.cid,trilha:L.trilha,nivel:L.nivel,acertos:L.ok,total:L.total,duracao_s:sec})}
- catch(e){if(e.status===401){sessaoExpirada();return}if(!L)return;L.step='reenviar';lb().innerHTML=`<div class="fin">${sqlito(evo(),'sad')}<h2 style="color:var(--bad-ink)">Não consegui enviar</h2><p>${esc(e.message)}</p><p class="mute">Suas respostas estão guardadas. Confira a conexão e clique para enviar de novo.</p></div>`;foot('','','Enviar de novo');return}
+ catch(e){if(e.status===401){sessaoExpirada();return}if(!L)return;L.step='reenviar';lb().innerHTML=`<div class="fin">${sqlito(evo(),'sad')}<h2 style="color:var(--bad-ink)">Não consegui enviar</h2><p>${esc(e.message)}</p><p class="mute">Suas respostas estão guardadas. Confira a conexão e ${clq} para enviar de novo.</p></div>`;foot('','','Enviar de novo');return}
  if(!L)return;const r=L.result;L.step='fin';
  lb().innerHTML=`<div class="fin">${sqlito(r.aprovado?N.f:evo(),r.aprovado?(N.id===niveisDe(S.trilha).length?'jedi':'happy'):'sad')}<h2 style="color:${r.aprovado?'var(--gold-d)':'var(--bad-ink)'}">${r.aprovado?(N.id===niveisDe(S.trilha).length?FRASE.dba:`Parabéns! Você desbloqueou o nível ${N.nome}!`):'Ainda não foi desta vez'}</h2><p class="mute">Prova do Nível ${N.nome}</p><div class="kpis"><div class="kpi" style="--k:${r.aprovado?'var(--gold-d)':'var(--bad)'}"><small>Nota</small><b>${nota(r.nota)}</b></div><div class="kpi" style="--k:var(--mint-d)"><small>Acertos</small><b>${r.acertos}/${r.total}</b></div><div class="kpi" style="--k:#2F95D8"><small>Mínimo</small><b>${nota(r.nota_minima)}</b></div></div><p>${r.aprovado?'Seu certificado foi emitido e já está na aba Certificados.':'Calma! Até os melhores DBAs já reprovaram numa prova. Revise as lições do nível e tente de novo: eu não vou deixar você desistir.'}</p></div>`;
  foot('','',r.certificado?'Ver meu certificado':'Voltar aos certificados');
