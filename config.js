@@ -17,8 +17,8 @@
    larguraMinima:  menor tela (px) aceita em aparelhos com toque.
    ===================================================================== */
 window.MENTA_CONFIG = {
-  modo: 'auto',
+  modo: 'demo',
   api: '',
-  somenteDesktop: true,
+  somenteDesktop: false,
   larguraMinima: 1024
 };
