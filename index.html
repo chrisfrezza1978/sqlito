@@ -1755,7 +1755,8 @@ async function importarBackup(c){
  const d=Demo.db(),em=String(c.aluno.email).trim().toLowerCase();let a=d.alunos.find(x=>x.email===em);const novo=!a;
  if(novo){let ap=String(c.aluno.apelido||'aluno');while(d.alunos.some(x=>x.apelido.toLowerCase()===ap.toLowerCase()))ap=ap.slice(0,17)+'_'+Math.floor(10+Math.random()*90);
   a={id:d.seq++,nome:c.aluno.nome,apelido:ap,email:em,senha:c.aluno.senha,vidas:c.aluno.vidas??5,som:c.aluno.som??1,trilha:c.aluno.trilha||null,criado:c.aluno.criado||new Date().toISOString(),port_publico:c.aluno.port_publico?1:0};d.alunos.push(a)}
- else if(!a.trilha&&c.aluno.trilha)a.trilha=c.aluno.trilha;
+ /* a trilha do backup é onde o aluno estava estudando: ela passa a ser a trilha aberta */
+ if(c.aluno.trilha&&TRILHAS_INFO.some(t=>t.id===c.aluno.trilha))a.trilha=c.aluno.trilha;
  const id=a.id;let n=0;
  (c.t||[]).forEach(t=>{if(!d.t.some(x=>x.id===t.id)){d.t.push({...t,aluno:id});n++}});
  (c.provas||[]).forEach(p=>{if(!d.provas.some(x=>x.id===p.id))d.provas.push({...p,aluno:id})});
@@ -1767,8 +1768,9 @@ async function importarBackup(c){
   if(kk.startsWith('hm.fila.')){let atual=[],vem=[];try{atual=JSON.parse(localStorage.getItem(kk)||'[]');vem=JSON.parse(v)}catch(e){}
    const ids=new Set(atual.map(x=>x.client_id));localStorage.setItem(kk,JSON.stringify(atual.concat(vem.filter(x=>!ids.has(x.client_id)))));return}
   if(localStorage.getItem(kk)==null)localStorage.setItem(kk,v)});
+ const ck='hm.cache.'+id,cc=LS.get(ck,null);if(cc&&a.trilha){cc.trilha=a.trilha;cc.trilhaLocal=0;LS.set(ck,cc)}
  await entrarComSessao(tok,Demo.prog(Demo.db(),a));
- toast(`Progresso importado! ${n} aula(s) nova(s) neste computador.${novo?'':' Sua senha deste navegador continua a mesma.'}`);
+ toast(`Progresso importado na trilha ${TRI(a.trilha).nome}: ${n} aula(s) nova(s) neste computador.${novo?'':' Sua senha deste navegador continua a mesma.'}`);
 }
 
 /* ---------- sincronização entre aparelhos ---------- */
