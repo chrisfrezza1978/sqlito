@@ -455,8 +455,14 @@ CREATE TEMP VIEW __sys_indexes AS
     db.exec(b.SEED);
     db.exec(META(b.catalogo));
     db.exec('PRAGMA foreign_keys = ON');
+    const dl = b.dialeto && DIALETOS[b.dialeto];
+    if (dl && dl.iniciar) dl.iniciar(db, b);
     return db;
   }
+  /* Dialetos: um banco de trilha pode declarar dialeto (ex.: 'databricks'). O dialeto recebe cada lote
+     antes do interpretador T-SQL, traduz e executa instrução por instrução com rodarBase. */
+  const DIALETOS = {};
+  function registrarDialeto(nome, d) { DIALETOS[nome] = d; }
   /* =====================================================================
      Interpretador T-SQL do laboratório
      Lê o lote como o SQL Server: instruções com ou sem ponto e vírgula, GO,
@@ -697,7 +703,15 @@ CREATE TEMP VIEW __sys_indexes AS
   function empilhar(ctx, nome) { ctx.pilha.push(nome); if (ctx.pilha.length > PROFUNDIDADE) throw new ErroSQL('Nível máximo de aninhamento de procedures, functions ou triggers excedido (limite 32).', 217); }
 
   /* ---------- execução de nós ---------- */
-  function rodar(ctx, sql) { const { nos, L } = compilar(sql); execNos(ctx, nos, L); }
+  function rodarBase(ctx, sql) { const { nos, L } = compilar(sql); execNos(ctx, nos, L); }
+  function rodar(ctx, sql) {
+    const b = BANCOS[ctx.banco || atual], dl = b && b.dialeto && DIALETOS[b.dialeto];
+    if (dl && dl.rodar && !ctx.semDialeto) {
+      ctx.semDialeto = true;
+      try { return dl.rodar(ctx, sql, (x) => rodarBase(ctx, x)); } finally { ctx.semDialeto = false; }
+    }
+    rodarBase(ctx, sql);
+  }
   function execNos(ctx, nos, L) { for (const n of nos) execNo(ctx, n, L); }
   function execNo(ctx, n, L) {
     if (++ctx.passos > 300000) throw new ErroSQL('Execução interrompida: o lote passou do limite de passos do laboratório (laço infinito?).', 50000);
@@ -1963,7 +1977,7 @@ CREATE TEMP VIEW __sys_indexes AS
     };
   }
 
-  const API = { AGORA, BANCOS, registrarBanco, usar, preparar, executar, novoBanco, registrar, traduzirErro, compilar, sessao };
+  const API = { AGORA, BANCOS, registrarBanco, usar, preparar, executar, novoBanco, registrar, traduzirErro, compilar, sessao, registrarDialeto, ErroSQL };
   Object.defineProperty(API, 'atual', { get: () => atual });
   Object.defineProperty(API, 'TABELAS', { get: () => (BANCOS[atual] || {}).TABELAS || [] });
   Object.defineProperty(API, 'SEED', { get: () => (BANCOS[atual] || {}).SEED || '' });

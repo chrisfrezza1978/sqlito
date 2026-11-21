@@ -9,7 +9,7 @@
     loja: { itens: 'produtos', item: 'produto', cat: 'categoria', pessoas: 'clientes', rotulo: 'clientes', negocio: 'a loja' },
     banco: { itens: 'tarifas', item: 'tarifa', cat: 'categoria', pessoas: 'clientes', rotulo: 'clientes', negocio: 'o banco' },
     agroeco: { itens: 'insumos', item: 'insumo', cat: 'categoria', pessoas: 'produtores', rotulo: 'produtores', negocio: 'a Menta Agro' }
-    // powerbi: trilha especial, sem Modo Entrevista
+    // powerbi e databricks: trilhas especiais, sem Modo Entrevista
   };
   function perguntas(id) {
     const b = B[id];
