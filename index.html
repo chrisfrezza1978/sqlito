@@ -640,6 +640,7 @@ tr.sob td{background:var(--bad-l)}tr.fal td{background:light-dark(#FFF1E6,#3A241
 <div id="janelaPequena" role="alert"><div><b>Aumente a janela do navegador</b><p>O SQLito foi feito para computador: o editor de SQL, os diagramas e as tabelas de resultado precisam de pelo menos 960 px de largura. Maximize a janela ou diminua o zoom (Ctrl −).</p></div></div>
 <div id="fx"></div>
 <script src="js/motor-sql.js"></script>
+<script src="js/motor-databricks.js"></script>
 <script src="js/projetos.js"></script>
 <script src="js/entrevista.js"></script>
 <script>
@@ -658,7 +659,8 @@ const TRILHAS_INFO=[
  {id:'loja',nome:'Menta Store',sub:'Loja virtual (e-commerce)',desc:'Clientes, produtos, pedidos, itens, entregas, avaliações e pagamentos.',tabs:'clientes · produtos · pedidos · itens_pedido · entregas',c:'#8B5CF6',d:'#5B34C4',ic:'cart',aula:'sacola'},
  {id:'banco',nome:'Banco Menta',sub:'Economia bancária e crédito',desc:'Clientes, contas, cartões, empréstimos, financiamento imobiliário, garantias, inadimplência e cobrança.',tabs:'clientes · contas · contratos · parcelas · garantias · cobrancas',c:'#0E7C86',d:'#095A61',ic:'safe',aula:'moeda'},
  {id:'agroeco',nome:'Economia do Agro',sub:'Crédito rural, safras e mercado',desc:'Produtores, safras por região, cotações, exportações, crédito rural, seguro, insumos e clima.',tabs:'produtores · safras · precos · credito_rural · exportacoes · clima',c:'#B7791F',d:'#8A5A12',ic:'scale',aula:'trigo'},
- {id:'powerbi',nome:'SQL para Power BI',sub:'Trilha especial · 8 etapas',desc:'Modelo estrela, consultas de importação, dCalendario, limpeza, views, SQL × DAX, carga incremental e performance.',tabs:'fato_vendas · fato_metas · dim_calendario · dim_produto · stg_vendas',c:'#D9A406',d:'#946F02',ic:'chart',aula:'barras',et:8,especial:1,rec:'Recomendada depois do Nível Básico de qualquer trilha.'}];
+ {id:'powerbi',nome:'SQL para Power BI',sub:'Trilha especial · 8 etapas',desc:'Modelo estrela, consultas de importação, dCalendario, limpeza, views, SQL × DAX, carga incremental e performance.',tabs:'fato_vendas · fato_metas · dim_calendario · dim_produto · stg_vendas',c:'#D9A406',d:'#946F02',ic:'chart',aula:'barras',et:8,especial:1,rec:'Recomendada depois do Nível Básico de qualquer trilha.'},
+ {id:'databricks',nome:'SQL no Databricks',sub:'Trilha especial · 12 etapas',desc:'Lakehouse do Banco Menta em camadas bronze, prata e ouro: volumes, read_files, COPY INTO, JSON, QUALIFY, MERGE, viagem no tempo, Unity Catalog, painéis e Genie.',tabs:'bronze.transacoes_raw · prata.clientes · prata.transacoes · ouro.transacoes_diarias',c:'#FF3621',d:'#C2261A',ic:'cloud',aula:'camadas',et:12,especial:1,rec:'Recomendada depois do Nível Básico de qualquer trilha. Alinhada ao exame Databricks Data Analyst Associate.'}];
 const ntDe=id=>TRI(id).et||23;
 const TRI=id=>TRILHAS_INFO.find(t=>t.id===id)||TRILHAS_INFO[0];
 const pref=id=>id&&id!=='hotel'?id+':':'';
@@ -670,6 +672,7 @@ const CARGOS={
  loja:['Estagiário','Vitrinista','Analista de Busca','Analista de Vendas','Cadastrador de Produtos','Atendente de Pedidos','Especialista em SEO','Analista de Logística','Gerente de Promoções','Analista de BI','Cientista de Dados','Engenheiro de Plataforma','Gerente Financeiro','Gerente de Catálogo','Analista de Regras de Negócio','Supervisor Fiscal','Analista Antifraude','Analista de Conciliação','Especialista em Precificação','Analista de Automação','Auditor de Pedidos','Administrador de Banco de Dados','Diretor Comercial','CEO da Menta Store']};
 CARGOS.banco=['Estagiário','Atendente','Assistente de Cadastro','Analista de Indicadores','Escriturário de Contas','Analista de Crédito Júnior','Gerente de Relacionamento','Analista de Cobrança','Analista de Tarifas','Analista de Risco','Analista de Carteira','Engenheiro de Dados','Tesoureiro','Arquiteto de Dados','Gestor de Contratos','Analista de Políticas de Crédito','Supervisor de Emissão','Analista de Prevenção à Fraude','Analista de Conciliação','Especialista em Precificação','Analista de Automação','Auditor de Crédito','Administrador de Banco de Dados','Diretor de Crédito'];
 CARGOS.agroeco=['Estagiário','Assistente de Operações','Analista Comercial Júnior','Analista de Safra','Assistente de Cadastro','Analista de Cadeia Produtiva','Gerente de Relacionamento Rural','Planejador Agrícola','Analista de Política Comercial','Analista de Inteligência de Mercado','Analista de Produtividade','Engenheiro de Dados','Tesoureiro','Arquiteto de Dados','Gestor de Carteira Rural','Analista de Crédito Rural','Analista de CPR','Analista de Qualidade de Dados','Analista de Conciliação','Economista Agrícola','Analista de Automação','Auditor de Crédito Rural','Administrador de Banco de Dados','Diretor de Agronegócio'];
+CARGOS.databricks=['Analista SQL','Explorador do Lakehouse','Engenheiro de Ingestão','Analista de Qualidade de Dados','Especialista em JSON','Engenheiro da Camada Prata','Analista de Deduplicação','Especialista em Delta Lake','Auditor de Versões','Modelador do Ouro','Analista de Indicadores','Guardião do Unity Catalog','Analista de Dados Databricks'];
 CARGOS.powerbi=['Usuário de Excel','Modelador Iniciante','Analista de Dados Júnior','Construtor de Calendários','Engenheiro de Limpeza de Dados','Arquiteto de Views','Tradutor DAX ↔ SQL','Engenheiro de Cargas','Especialista em BI'];
 const cargoDe=(id,n)=>(CARGOS[id]||CARGOS.hotel)[Math.min(n,ntDe(id))];
 
@@ -682,6 +685,7 @@ const I={
  moeda:'<circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity=".25"/><path d="M14.6 9.3c-.5-.9-1.5-1.4-2.6-1.4-1.5 0-2.6.8-2.6 2 0 2.7 5.3 1.4 5.3 4.2 0 1.2-1.2 2-2.7 2-1.2 0-2.2-.5-2.7-1.4M12 6v1.9M12 16.1V18"/>',
  trigo:'<path d="M12 21.5V6"/><path fill="currentColor" stroke-width="1.2" d="M12 2.3c1.3 1.1 1.3 3.1 0 4.3-1.3-1.2-1.3-3.2 0-4.3zM12 10.4c-.4-2.4-2-3.8-4.6-3.8.3 2.4 2 3.8 4.6 3.8zM12 10.4c.4-2.4 2-3.8 4.6-3.8-.3 2.4-2 3.8-4.6 3.8zM12 14.7c-.4-2.4-2-3.8-4.6-3.8.3 2.4 2 3.8 4.6 3.8zM12 14.7c.4-2.4 2-3.8 4.6-3.8-.3 2.4-2 3.8-4.6 3.8zM12 19c-.4-2.4-2-3.8-4.6-3.8.3 2.4 2 3.8 4.6 3.8zM12 19c.4-2.4 2-3.8 4.6-3.8-.3 2.4-2 3.8-4.6 3.8z"/>',
  barras:'<path d="M3.5 20.5h17"/><g stroke-width="2"><rect x="5" y="12" width="3.6" height="8.5" rx="1" fill="currentColor" fill-opacity=".25"/><rect x="10.2" y="4.5" width="3.6" height="16" rx="1" fill="currentColor" fill-opacity=".25"/><rect x="15.4" y="8.5" width="3.6" height="12" rx="1" fill="currentColor" fill-opacity=".25"/></g>',
+ camadas:'<path d="M12 3.5 21 8l-9 4.5L3 8z" fill="currentColor" fill-opacity=".25"/><path d="m3 12 9 4.5 9-4.5M3 16l9 4.5 9-4.5"/>',
  star:`<path ${F} d="M12 2.8l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17l-5.6 3 1.1-6.2L3 9.4l6.2-.9z"/>`,
  check:'<path d="M5 12.5l4.5 4.5L19 7.5" stroke-width="3.4"/>',
  lock:`<rect ${F} x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/>`,
@@ -924,7 +928,7 @@ function passosConsulta(p){
  const agg=/\b(COUNT|SUM|AVG|MIN|MAX|STRING_AGG|COUNT_BIG|STDEV|VAR)\s*\(/i.test(p.lista)&&!/\bOVER\s*\(/i.test(p.lista);
  const grupoSimples=GB&&!/\b(ROLLUP|CUBE|GROUPING)\b/i.test(GB);
  const P=[];
- if(FR)P.push({k:'FROM',nome:p.join?'FROM + JOIN':'FROM',sql:monta('*',{w:false,g:false,h:false}),txt:(n)=>p.join?`Primeiro o SQL Server monta a tabela de trabalho: junta as tabelas do FROM e guarda cada combinação que atende ao ON. Resultado: ${pl(n,'linha')}.`:`Primeiro o SQL Server lê a tabela do FROM: ${pl(n,'linha')}, com todas as colunas.`});
+ if(FR)P.push({k:'FROM',nome:p.join?'FROM + JOIN':'FROM',sql:monta('*',{w:false,g:false,h:false}),txt:(n)=>p.join?`Primeiro o ${DBX()?"Databricks":"SQL Server"} monta a tabela de trabalho: junta as tabelas do FROM e guarda cada combinação que atende ao ON. Resultado: ${pl(n,'linha')}.`:`Primeiro o ${DBX()?"Databricks":"SQL Server"} lê a tabela do FROM: ${pl(n,'linha')}, com todas as colunas.`});
  if(WH)P.push({k:'WHERE',nome:'WHERE',sql:monta('*',{g:false,h:false}),txt:(n,a)=>`O WHERE testa linha a linha e só deixa passar quem atende à condição: ficaram ${n} de ${a}.`});
  if(grupoSimples)P.push({k:'GROUP BY',nome:'GROUP BY',sql:monta(`${GB}, COUNT(*) AS [linhas no grupo]`,{h:false}),txt:(n,a)=>`O GROUP BY junta as ${a} linhas em ${pl(n,'grupo')}, um para cada valor de ${GB}. A coluna “linhas no grupo” mostra quantas linhas caíram em cada um.`});
  if(grupoSimples&&HV)P.push({k:'HAVING',nome:'HAVING',sql:monta(`${GB}, COUNT(*) AS [linhas no grupo]`),txt:(n,a)=>`O HAVING filtra os grupos (não as linhas): ficaram ${n} de ${a}. Por isso ele aceita SUM, COUNT e companhia, e o WHERE não.`});
@@ -947,7 +951,7 @@ async function passoAPasso(sql,runner){
  const segs=Object.entries(p.seg).sort((a,b)=>a[1].i-b[1].i);
  const texto=()=>{let h=esc(p.s.slice(0,segs[0][1].i));segs.forEach(([k,v])=>{h+=`<span class="sg" data-k="${k}">${hl(p.s.slice(v.i,v.f))}</span>`});return h};
  let at=0,tim=null;
- modal(`<h3>${ic('steps')} Passo a passo da consulta</h3><p class="mute">Você escreve começando pelo SELECT, mas o SQL Server executa nesta ordem:</p>
+ modal(`<h3>${ic('steps')} Passo a passo da consulta</h3><p class="mute">Você escreve começando pelo SELECT, mas o ${DBX()?"Databricks":"SQL Server"} executa nesta ordem:</p>
  <div class="pp-ord" role="tablist">${P.map((x,i)=>`<button role="tab" data-pp="${i}"><i>${i+1}</i>${x.nome}</button>`).join('')}</div>
  <pre class="pp-q" aria-label="Consulta">${texto()}</pre>
  <div class="pp-funil" aria-hidden="true">${P.map((x,i)=>`<div data-pf="${i}"><b>${nL(res[i])}</b><span style="height:${Math.max(4,nL(res[i])/max*60)}px"></span></div>`).join('')}</div>
@@ -1182,7 +1186,7 @@ async function bindPortfolioPerfil(){
   $('#pfSw').onchange=async e=>{try{PROJ.port=await API.req('PUT','portfolio/visibilidade',{publico:e.target.checked});toast(e.target.checked?'Portfólio público.':'Portfólio privado.');bindPortfolioPerfil()}catch(er){toast(er.message)}}}
  catch(e){}}
 function linkLinkedIn(c,N,T,link){
- const d=new Date(c.emitido_em),q=new URLSearchParams({startTask:'CERTIFICATION_NAME',name:`Nível ${N.nome} em SQL Server · Trilha ${T.nome}`,organizationName:'SQLito',issueYear:String(d.getFullYear()),issueMonth:String(d.getMonth()+1),certId:c.codigo});
+ const d=new Date(c.emitido_em),q=new URLSearchParams({startTask:'CERTIFICATION_NAME',name:`Nível ${N.nome} em ${T.id==='databricks'?'Databricks SQL':'SQL Server'} · Trilha ${T.nome}`,organizationName:'SQLito',issueYear:String(d.getFullYear()),issueMonth:String(d.getMonth()+1),certId:c.codigo});
  if(link)q.set('certUrl',link);return 'https://www.linkedin.com/profile/add?'+q.toString()}
 
 /* ====================================================================
@@ -1366,7 +1370,7 @@ function drawQ(){
  let h=`<div class="q" id="qq"><span class="kind">${ic(kinds[q.k][0])}${L.mode==='prova'?`Questão ${L.done+1} de ${L.total} · ${kinds[q.k][1]}`:kinds[q.k][1]}</span><h2>${q.p}</h2>`;
  if(q.k==='mc'){L.ord=shuffle(q.o.map((_,i)=>i));h+=`<div class="opts" role="radiogroup">${L.ord.map((oi,n)=>`<button class="opt ${q.m?'mono':''}" role="radio" aria-checked="false" data-o="${oi}"><span class="n">${n+1}</span><span>${esc(q.o[oi])}</span></button>`).join('')}</div>`}
  else if(q.k==='blk'){L.toks=shuffle(q.a.split('|').concat(q.x||[]));L.pick=[];h+=`<div class="slots" id="slots" aria-label="Sua resposta"></div><div class="bank" id="bank"></div>`}
- else h+=`<textarea class="ed" id="ed" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Escreva sua consulta SQL" placeholder="Escreva sua consulta aqui…">${esc(q.pre||'')}</textarea><div class="chips">${['SELECT','DISTINCT','*','FROM','WHERE','AND','OR','LIKE','IN (','TOP','JOIN','LEFT JOIN','ON','GROUP BY','ORDER BY','HAVING','AS','COUNT(','SUM(','CASE','WHEN','THEN','END','IS NULL','GETDATE()',',','=',"'",'(',')',';'].map(c=>`<button class="chip" data-ins="${esc(c)}">${esc(c)}</button>`).join('')}</div><div class="row"><button class="btn ghost" id="runQ">${ic('play')}Executar</button><button class="lnk" id="stepQ">${ic('steps')}Passo a passo</button><button class="lnk" id="tbls">${ic('table')}Ver tabelas</button>${q.h&&L.mode!=='prova'?`<button class="lnk" id="hintB">${ic('bulb')}Dica</button>`:''}</div><div id="hintT"></div><div class="res" id="qRes"></div>`;
+ else h+=`<textarea class="ed" id="ed" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Escreva sua consulta SQL" placeholder="Escreva sua consulta aqui…">${esc(q.pre||'')}</textarea><div class="chips">${(DBX()?['SELECT','DISTINCT','*','FROM','WHERE','AND','OR','ILIKE','IN (','JOIN','LEFT JOIN','ON','GROUP BY ALL','GROUP BY','ORDER BY','HAVING','QUALIFY','LIMIT','AS','COUNT(','SUM(','CASE','WHEN','THEN','END','IS NULL','::','current_date()',',','=',"'",'(',')',';']:['SELECT','DISTINCT','*','FROM','WHERE','AND','OR','LIKE','IN (','TOP','JOIN','LEFT JOIN','ON','GROUP BY','ORDER BY','HAVING','AS','COUNT(','SUM(','CASE','WHEN','THEN','END','IS NULL','GETDATE()',',','=',"'",'(',')',';']).map(c=>`<button class="chip" data-ins="${esc(c)}">${esc(c)}</button>`).join('')}</div><div class="row"><button class="btn ghost" id="runQ">${ic('play')}Executar</button><button class="lnk" id="stepQ">${ic('steps')}Passo a passo</button><button class="lnk" id="tbls">${ic('table')}Ver tabelas</button>${q.h&&L.mode!=='prova'?`<button class="lnk" id="hintB">${ic('bulb')}Dica</button>`:''}</div><div id="hintT"></div><div class="res" id="qRes"></div>`;
  lb().innerHTML=h+'</div>';lb().scrollTop=0;lb().classList.remove('lockd');
  foot('','',L.mode==='prova'?'Responder':'Verificar',true);
  if(q.k==='mc')lb().querySelectorAll('.opt').forEach(b=>b.onclick=()=>pickOpt(b));
@@ -1401,7 +1405,7 @@ async function check(){
   let humor='happy',tit=L.ok===1?FRASE.ok[0]:sorteia(FRASE.ok),sub='';const txt=q.k==='code'?$('#ed').value.trim():'';
   if(q.k==='code'&&(L.ui>=8||q.a.length>110)){humor='jedi';tit=FRASE.jedi;sub='Essa era difícil, e você resolveu sem suar.'}
   else if(q.k==='mc'&&/\berr|\bbug|corrig|problema|falha/i.test(q.p)){tit=FRASE.bug;sub='Tá bom, tá bom… você é bom nisso. Mas vem coisa pior por aí.'}
-  if(q.k==='code'&&!/;\s*$/.test(txt)&&!L.pv){L.pv=1;humor='shock';tit=FRASE.pv;sub='Acertou, mas faltou o ; no fim. No SQL Server ele é opcional na maioria dos comandos, mas é boa prática e é obrigatório antes de um WITH (CTE) e no fim do MERGE.'}
+  if(q.k==='code'&&!/;\s*$/.test(txt)&&!L.pv){L.pv=1;humor='shock';tit=FRASE.pv;sub=DBX()?'Acertou, mas faltou o ; no fim. No Databricks o ; separa os comandos quando você roda vários de uma vez; termine cada um com ele.':'Acertou, mas faltou o ; no fim. No SQL Server ele é opcional na maioria dos comandos, mas é boa prática e é obrigatório antes de um WITH (CTE) e no fim do MERGE.'}
   else if(bonus&&humor==='happy')sub=`Combo x${L.combo}! Tá ficando perigoso, hein?`;
   foot('ok',`${sqlito(evo(),humor)}<div><h3>${tit}</h3><p>${sub?esc(sub)+' · ':''}+10 XP${bonus?` · bônus +${bonus} XP`:''}${q.w?' · '+esc(q.w):''}</p></div>`,'Continuar');
   tone(SND.ok);confetti(bonus?40:18);floatTxt(bonus?`+${10+bonus} XP`:'+10 XP',go());
@@ -1473,17 +1477,20 @@ function labSessao(){
  if(!SQL)return null;
  if(!LAB.s||LAB.trilha!==S.trilha){if(LAB.s)LAB.s.fechar();LAB.s=MotorSQL.sessao(SQL);LAB.trilha=S.trilha;LAB.sel=null;LAB.sig='';LAB.zoom=0;LAB.ultimo=null}
  return LAB.s}
+const DBX=()=>((window.MotorSQL&&MotorSQL.BANCOS[S.trilha])||{}).dialeto==='databricks';   // trilha no dialeto Databricks SQL
+const nomeLab=t=>DBX()&&MotorSQL.DATABRICKS?MotorSQL.DATABRICKS.logico(t):t;
+const limSQL=(n,resto)=>DBX()?`SELECT ${resto}\nLIMIT ${n};`:null;
 const tipoSS=t=>{t=String(t||'').toUpperCase();return t==='INTEGER'?'INT':t||'—'};
 function labMeta(){
  const db=LAB.s.db(),q=s=>{const r=db.exec(s);return r.length?r[0].values:[]},aspa=t=>t.replace(/'/g,"''");
  const tabs=q(`SELECT name, sql FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite%' AND substr(name,1,2) <> '__' ORDER BY rowid`);
  LAB.sig=tabs.map(t=>t[1]).join('|');
  return tabs.map(([t])=>{
-  const cols=q(`SELECT name, type, pk, "notnull" FROM pragma_table_info('${aspa(t)}')`).map(([n,ty,pk,nn])=>({n,ty:tipoSS(ty),pk:!!pk,nn:!!nn}));
+  const cols=q(`SELECT name, type, pk, "notnull" FROM pragma_table_info('${aspa(t)}')`).map(([n,ty,pk,nn])=>({n,ty:DBX()&&MotorSQL.DATABRICKS?MotorSQL.DATABRICKS.tipo(ty).toUpperCase():tipoSS(ty),pk:!!pk,nn:!!nn}));
   const fks=q(`SELECT "from", "table", "to" FROM pragma_foreign_key_list('${aspa(t)}')`).map(([de,tab,para])=>({de,tab,para}));
   let linhas=0;try{linhas=q(`SELECT COUNT(*) FROM "${t.replace(/"/g,'""')}"`)[0][0]}catch(e){}
-  const info=TABLES.find(x=>x[0].toLowerCase()===t.toLowerCase());
-  return{nome:t,desc:info?info[1]:'Criada por você nesta sessão',cols,fks,linhas,nova:!info}})}
+  const info=TABLES.find(x=>x[0].toLowerCase()===nomeLab(t).toLowerCase());
+  return{nome:nomeLab(t),desc:info?info[1]:'Criada por você nesta sessão',cols,fks,linhas,nova:!info}})}
 function layoutER(T){
  const W=184,RH=21,HH=34,GX=86,GY=26,by=new Map(T.map(t=>[t.nome.toLowerCase(),t]));
  const rank=new Map(),visita=new Set();
@@ -1510,7 +1517,7 @@ function svgER(T,L){
  const cor=TRI(S.trilha).c,c=s=>esc(s);
  let h=`<svg id="erSvg" viewBox="0 0 ${L.W} ${L.H}" width="${L.W}" height="${L.H}" role="img" aria-label="Diagrama das tabelas e relacionamentos"><defs><pattern id="erP" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.2" class="er-dot"/></pattern></defs><rect width="100%" height="100%" fill="url(#erP)"/>`;
  L.arestas.forEach((a,i)=>{h+=`<g class="er-e" data-de="${c(a.de)}" data-para="${c(a.para)}"><path d="${a.d}"/><text x="${a.auto?a.x1+6:a.x1+(a.x1>a.x2?-12:6)}" y="${a.y1-4}">N</text><text x="${a.x2+5}" y="${a.y2-4}">1</text></g>`});
- T.forEach(t=>{h+=`<g class="er-t ${t.nova?'nova':''}" data-t="${c(t.nome)}" tabindex="0" role="button" aria-label="Tabela ${c(t.nome)}, ${t.cols.length} colunas, ${t.linhas} linhas"><rect class="b" x="${t.x}" y="${t.y}" width="${t.w}" height="${t.h}" rx="12"/><path class="hd" d="M${t.x} ${t.y+12}a12 12 0 0 1 12-12h${t.w-24}a12 12 0 0 1 12 12v${L.HH-12}h-${t.w}z" fill="${t.nova?'#8B95A1':cor}"/><text class="tn" x="${t.x+12}" y="${t.y+22}">${c(t.nome.length>19?t.nome.slice(0,18)+'…':t.nome)}</text><text class="tl" x="${t.x+t.w-10}" y="${t.y+22}" text-anchor="end">${t.linhas}</text>`;
+ T.forEach(t=>{h+=`<g class="er-t ${t.nova?'nova':''}" data-t="${c(t.nome)}" tabindex="0" role="button" aria-label="Tabela ${c(t.nome)}, ${t.cols.length} colunas, ${t.linhas} linhas"><rect class="b" x="${t.x}" y="${t.y}" width="${t.w}" height="${t.h}" rx="12"/><path class="hd" d="M${t.x} ${t.y+12}a12 12 0 0 1 12-12h${t.w-24}a12 12 0 0 1 12 12v${L.HH-12}h-${t.w}z" fill="${t.nova?'#8B95A1':cor}"/><text class="tn" x="${t.x+12}" y="${t.y+22}">${(n=>c(n.length>19?n.slice(0,18)+'…':n))(t.nome.replace(/^banco\./,''))}</text><text class="tl" x="${t.x+t.w-10}" y="${t.y+22}" text-anchor="end">${t.linhas}</text>`;
   t.cols.forEach((col,i)=>{const y=t.y+L.HH+i*L.RH+15,fk=t.fks.some(f=>f.de.toLowerCase()===col.n.toLowerCase());
    h+=`<text class="cn ${col.pk?'pk':''}" x="${t.x+12}" y="${y}">${c(col.n.length>16?col.n.slice(0,15)+'…':col.n)}</text>${col.pk?`<text class="bd pkb" x="${t.x+t.w-10}" y="${y}" text-anchor="end">PK</text>`:fk?`<text class="bd fkb" x="${t.x+t.w-10}" y="${y}" text-anchor="end">FK</text>`:`<text class="ty" x="${t.x+t.w-10}" y="${y}" text-anchor="end">${c(col.ty.toLowerCase().slice(0,13))}</text>`}`});
   h+='</g>'});
@@ -1518,7 +1525,7 @@ function svgER(T,L){
 function viewDB(){
  const T=TRI(S.trilha),dados=labDados(),txt=dados.draft!=null?dados.draft:(MotorSQL.BANCOS[S.trilha].lab||'SELECT * FROM '+(TABLES[0]||['clientes'])[0]+';');
  return `<button class="lnk" id="dbBack">${ic('map')}Voltar à trilha</button><h1 class="h1">Laboratório — ${T.nome}</h1>
- <p class="mute">Aqui nada vale ponto. As alterações (INSERT, CREATE TABLE, procedures…) ficam guardadas enquanto o app estiver aberto, como numa janela de consulta do SQL Server. Para voltar aos dados originais, ${clq} em Reiniciar banco.</p>
+ ${DBX()?`<p class="mute"><b>Databricks SQL (simulado).</b> Aqui nada vale ponto. O laboratório imita um SQL warehouse: catálogo <code>banco</code> com os esquemas bronze, prata e ouro, tabelas Delta com histórico (DESCRIBE HISTORY, VERSION AS OF, RESTORE), volumes com arquivos e permissões do Unity Catalog. As alterações ficam guardadas enquanto o app estiver aberto. Para voltar aos dados originais, ${clq} em Reiniciar banco.</p>`:`<p class="mute">Aqui nada vale ponto. As alterações (INSERT, CREATE TABLE, procedures…) ficam guardadas enquanto o app estiver aberto, como numa janela de consulta do SQL Server. Para voltar aos dados originais, ${clq} em Reiniciar banco.</p>`}
  <div class="lab-tabs" role="tablist"><button role="tab" data-lm="diag" aria-selected="${LAB.modo==='diag'}">${ic('db')}Diagrama</button><button role="tab" data-lm="lista" aria-selected="${LAB.modo==='lista'}">${ic('list')}Lista</button><span class="lab-zoom" ${LAB.modo==='diag'?'':'hidden'}><button class="lnk" data-z="-1" aria-label="Diminuir">−</button><button class="lnk" data-z="0" aria-label="Ajustar à tela">Ajustar</button><button class="lnk" data-z="1" aria-label="Aumentar">+</button></span></div>
  <div id="erBox" class="er ${LAB.modo==='diag'?'':'lista'}"><p class="cap" style="padding:16px">Carregando o banco…</p></div>
  <p class="cap">${ic('bulb')} ${CLQ} numa tabela para ver colunas e relacionamentos. No diagrama, cada linha liga a chave estrangeira (N) à chave primária (1).</p>
@@ -1551,7 +1558,7 @@ function detalhe(n){
  const box=$('#erDet');if(!box)return;const t=LAB.meta.find(x=>x.nome===n);if(!t){box.innerHTML='';return}
  const filhos=[];LAB.meta.forEach(o=>o.fks.forEach(f=>{if(String(f.tab).toLowerCase()===t.nome.toLowerCase()&&o!==t)filhos.push({o,f})}));
  const ap=s=>s.replace(/[^a-z]/gi,'').slice(0,1).toLowerCase()||'t';
- const joinSQL=(filho,col,pai,pk)=>{let a=ap(filho),b=ap(pai);if(a===b)b=b+'2';return `SELECT TOP (20) ${a}.*, ${b}.*\nFROM ${filho} AS ${a}\nJOIN ${pai} AS ${b} ON ${b}.${pk} = ${a}.${col};`};
+ const joinSQL=(filho,col,pai,pk)=>{let a=ap(filho),b=ap(pai);if(a===b)b=b+'2';return DBX()?`SELECT ${a}.*, ${b}.*\nFROM ${filho} AS ${a}\nJOIN ${pai} AS ${b} ON ${b}.${pk} = ${a}.${col}\nLIMIT 20;`:`SELECT TOP (20) ${a}.*, ${b}.*\nFROM ${filho} AS ${a}\nJOIN ${pai} AS ${b} ON ${b}.${pk} = ${a}.${col};`};
  const rels=t.fks.map(f=>{const p=LAB.meta.find(x=>x.nome.toLowerCase()===String(f.tab).toLowerCase());const pk=f.para||(p&&(p.cols.find(c=>c.pk)||{}).n)||'id';return{txt:`${t.nome}.${f.de} → ${f.tab}.${pk}`,sql:joinSQL(t.nome,f.de,f.tab,pk)}})
   .concat(filhos.map(({o,f})=>{const pk=f.para||(t.cols.find(c=>c.pk)||{}).n||'id';return{txt:`${o.nome}.${f.de} → ${t.nome}.${pk}`,sql:joinSQL(o.nome,f.de,t.nome,pk)}}));
  box.innerHTML=`<div class="card er-card"><div class="er-h"><div><h3>${esc(t.nome)}</h3><p class="mute">${esc(t.desc)} · ${pl(t.linhas,'linha')} · ${pl(t.cols.length,'coluna')}</p></div><button class="lnk" id="erX" aria-label="Fechar detalhes">${ic('x')}</button></div>
@@ -1561,7 +1568,7 @@ function detalhe(n){
  box.querySelectorAll('[data-ins]').forEach(b=>b.onclick=()=>inserirNoEditor(b.dataset.ins));
  box.querySelectorAll('[data-js]').forEach(b=>b.onclick=()=>{inserirNoEditor(rels[+b.dataset.js].sql,true);rodarLab()});
  $('#erX').onclick=()=>selTabela(t.nome);
- $('#erVer').onclick=()=>{inserirNoEditor(`SELECT TOP (50) *\nFROM ${t.nome};`,true);rodarLab()};
+ $('#erVer').onclick=()=>{inserirNoEditor(limSQL(50,`*\nFROM ${t.nome}`)||`SELECT TOP (50) *\nFROM ${t.nome};`,true);rodarLab()};
  $('#erCnt').onclick=()=>{inserirNoEditor(`SELECT COUNT(*) AS linhas\nFROM ${t.nome};`,true);rodarLab()}}
 async function rodarLab(){
  const out=$('#sbRes'),ed=$('#sb');if(!out||!ed)return;const sql=ed.value;if(!sql.trim())return;
@@ -1609,7 +1616,8 @@ function bindMe(){$('#trocar').onclick=()=>showPick(false);$('#snd').onclick=()=
 
 /* ---------- níveis de certificação ---------- */
 const NIVEIS=[{id:1,nome:'Básico',et:[1,4],carga:20,min:7,q:15,f:1,c:'#1E6BFF',d:'#1546B8'},{id:2,nome:'Intermediário',et:[5,8],carga:20,min:7,q:15,f:2,c:'#0891B2',d:'#0E6A82'},{id:3,nome:'Avançado',et:[9,13],carga:25,min:7,q:15,f:3,c:'#FF7A1A',d:'#D35F00'},{id:4,nome:'Especialista',et:[14,23],carga:50,min:7,q:15,f:3,c:'#0B1F3A',d:'#06122A'}];
-const niveisDe=id=>NIVEIS.filter(N=>N.et[0]<=ntDe(id));
+const NV=(n,id)=>{const N=NIVEIS[n-1];return N&&{...N,et:[N.et[0],Math.min(N.et[1],ntDe(id))]}};   // nível com as etapas limitadas ao tamanho da trilha
+const niveisDe=id=>NIVEIS.filter(N=>N.et[0]<=ntDe(id)).map(N=>NV(N.id,id));
 const licoesDoNivel=N=>ALL.filter(x=>x.ui+1>=N.et[0]&&x.ui+1<=N.et[1]);
 const etapasTxt=N=>{const n=UNITS.slice(N.et[0]-1,N.et[1]).map(u=>u.name);return n.length>1?n.slice(0,-1).join(', ')+' e '+n[n.length-1]:n[0]};
 const nota=v=>(+v).toFixed(1).replace('.',',');
@@ -1650,12 +1658,12 @@ const Demo={K:'hm.demo.v4',
  code(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',b=()=>Array.from(crypto.getRandomValues(new Uint8Array(4)),x=>A[x%A.length]).join('');return `HM-${b()}-${b()}`},
  seed(){
   const d={alunos:[],t:[],provas:[],certs:[],sess:{},seq:1},now=Date.now();
-  [['Ana Beatriz Souza','ana.souza','hotel',90],['Bruno Henrique Lima','bruno_lima','vet',62],['Carla Mendes Dias','carlad','agro',45],['Diego Rocha Alves','diegorocha','loja',40],['Elisa Prado Nunes','elisa.p','vet',22],['Gabriela Torres Silva','gabi.t','loja',33],['Isabela Martins Reis','isa_m','agro',51],['João Pedro Ramos','jpramos','hotel',12],['Lucas Ferreira Gomes','lucasf','vet',4],['Marina Castro Leite','marinacl','banco',58],['Nelson Prates Boa Vista','nelson.agro','agroeco',27],['Olívia Duarte Ramos','olivia.bi','powerbi',80]].forEach(([nome,apelido,tr,k],i)=>{
+  [['Ana Beatriz Souza','ana.souza','hotel',90],['Bruno Henrique Lima','bruno_lima','vet',62],['Carla Mendes Dias','carlad','agro',45],['Diego Rocha Alves','diegorocha','loja',40],['Elisa Prado Nunes','elisa.p','vet',22],['Gabriela Torres Silva','gabi.t','loja',33],['Isabela Martins Reis','isa_m','agro',51],['João Pedro Ramos','jpramos','hotel',12],['Lucas Ferreira Gomes','lucasf','vet',4],['Marina Castro Leite','marinacl','banco',58],['Nelson Prates Boa Vista','nelson.agro','agroeco',27],['Olívia Duarte Ramos','olivia.bi','powerbi',80],['Rafael Souza Lima','rafa.dbx','databricks',46]].forEach(([nome,apelido,tr,k],i)=>{
    const id=d.seq++,ks=chavesDe(tr);d.alunos.push({id,nome,apelido,email:apelido.replace(/[._]/g,'')+'@exemplo.dev',senha:this.hash('Hotel@2026'),vidas:5,som:1,trilha:tr,criado:new Date(now-40*864e5).toISOString()});
    for(let j=0;j<k;j++)d.t.push({id:uuid(),aluno:id,licao:ks[j],acertos:NQ,erros:(i+j)%3,xp:NQ*10+5*((i+j)%2),em:new Date(now-(k-j)*(1.5+i*0.4)*36e5).toISOString()})});
   [[1,13],[2,12]].forEach(([nivel,ac])=>{const p={id:uuid(),aluno:1,trilha:'hotel',nivel,acertos:ac,total:15,nota:Math.round(ac/15*1000)/100,aprovado:true,em:new Date(now-(3-nivel)*864e5).toISOString()};d.provas.push(p);d.certs.push({codigo:this.code(),aluno:1,trilha:'hotel',nivel,nota:p.nota,nome:d.alunos[0].nome,em:p.em})});
   return d},
- cert(c){const N=NIVEIS[c.nivel-1],tr=c.trilha||'hotel';return{codigo:c.codigo,trilha:tr,trilha_nome:TRI(tr).nome,nivel_id:c.nivel,nivel:N.nome,nome:c.nome,nota:c.nota,carga_horaria:N.carga,etapas:N.et,etapas_texto:etapasDe(tr,N),emitido_em:c.em,url_verificacao:null,url_pdf:null}},
+ cert(c){const tr=c.trilha||'hotel',N=NV(c.nivel,tr);return{codigo:c.codigo,trilha:tr,trilha_nome:TRI(tr).nome,nivel_id:c.nivel,nivel:N.nome,nome:c.nome,nota:c.nota,carga_horaria:N.carga,etapas:N.et,etapas_texto:etapasDe(tr,N),emitido_em:c.em,url_verificacao:null,url_pdf:null}},
  prog(d,a){
   const mine=d.t.filter(t=>t.aluno===a.id),feitas=new Set(mine.map(t=>t.licao)),soma=k=>mine.reduce((s,t)=>s+t[k],0),ac=soma('acertos'),er=soma('erros'),xp=soma('xp');
   const dias=new Set(mine.map(t=>day(new Date(t.em))));let of=0,dd=new Date();if(!dias.has(day(dd)))dd=new Date(Date.now()-864e5);while(dias.has(day(dd))){of++;dd=new Date(dd.getTime()-864e5)}
@@ -1690,7 +1698,7 @@ const Demo={K:'hm.demo.v4',
    const lista=Object.entries(soma).map(([id,s])=>({aluno_id:+id,apelido:(d.alunos.find(x=>x.id===+id)||{}).apelido,xp:s.xp,licoes:s.l.size})).filter(r=>r.apelido).sort((x,y)=>y.xp-x.xp||x.apelido.localeCompare(y.apelido));
    lista.forEach(r=>r.posicao=1+lista.filter(o=>o.xp>r.xp).length);const eu=lista.find(r=>r.aluno_id===a.id);
    return ok({periodo:per,desde:per==='semana'?ini.toISOString():null,itens:lista.slice(0,50).map(r=>({posicao:r.posicao,apelido:r.apelido,xp:r.xp,licoes:r.licoes,eu:r.aluno_id===a.id})),eu:eu?{posicao:eu.posicao,xp:eu.xp}:null})}
-  if(p==='provas'){const a=me(),N=NIVEIS[b.nivel-1],tr=b.trilha||'hotel';if(!N||!valida(tr)||N.et[0]>ntDe(tr))this.err(404,'Nível ou trilha inexistente.');
+  if(p==='provas'){const a=me(),tr=b.trilha||'hotel',N=NV(b.nivel,tr);if(!N||!valida(tr)||N.et[0]>ntDe(tr))this.err(404,'Nível ou trilha inexistente.');
    const ex=d.provas.find(x=>x.id===b.client_id);
    if(!ex){const ks=chavesDe(tr).filter((k,i)=>{const e=Math.floor(i/NL)+1;return e>=N.et[0]&&e<=N.et[1]}),f=ks.filter(k=>d.t.some(t=>t.aluno===a.id&&t.licao===k)).length;if(f<ks.length)this.err(403,`Conclua todas as lições do nível ${N.nome} para liberar a prova (${f}/${ks.length}).`)}
    const pr=ex||{id:b.client_id,aluno:a.id,trilha:tr,nivel:N.id,acertos:b.acertos,total:b.total,nota:Math.round(b.acertos/b.total*1000)/100,em:new Date().toISOString()};
@@ -1734,8 +1742,12 @@ async function exportarProgresso(){
   t:doAluno('t'),provas:doAluno('provas'),certs:doAluno('certs'),port:doAluno('port'),ent:doAluno('ent'),local:bkpLocal(id)};
  const xp=conteudo.t.reduce((s,t)=>s+t.xp,0),aulas=new Set(conteudo.t.map(t=>t.licao)).size;
  const arq={app:'SQLito',...BKP,exportado_em:new Date().toISOString(),resumo:{apelido:a.apelido,aulas,xp,certificados:conteudo.certs.length},conteudo,verificacao:bkpSoma(conteudo)};
- const url=URL.createObjectURL(new Blob([JSON.stringify(arq,null,1)],{type:'application/json'})),l=document.createElement('a');
- l.href=url;l.download=`sqlito-progresso-${a.apelido}-${day()}.json`;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);
+ const nomeArq=`sqlito-progresso-${a.apelido}-${day()}.json`,txt=JSON.stringify(arq,null,1);
+ /* dentro de um artefato do Claude o download passa pela capacidade "downloads" (o visitante confirma) */
+ const dl=window.claude&&typeof window.claude.use==='function'?await window.claude.use('downloads').catch(()=>null):null;
+ if(dl){try{await dl.save({filename:nomeArq,data:txt})}catch(e){toast(e&&e.code==='declined'?'Backup cancelado.':'Não foi possível salvar aqui: '+((e&&(e.message||e.code))||''));return}}
+ else{const url=URL.createObjectURL(new Blob([txt],{type:'application/json'})),l=document.createElement('a');
+  l.href=url;l.download=nomeArq;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(url),4000)}
  S.bkpAt=new Date().toISOString();save();toast(`Backup salvo: ${aulas} aulas, ${fmtXP(xp)} XP e ${conteudo.certs.length} certificado(s).`);if(tab==='me')render();
 }
 function escolherBackup(){
@@ -1863,7 +1875,7 @@ function cobrar(){
 let pickForcado=false;
 function showPick(forcado){
  pickForcado=!!forcado;const p=$('#pick'),feitas=id=>{const t=(S.trilhas||[]).find(x=>x.id===id);return t?t.licoes_feitas:Object.keys(S.done).filter(k=>trilhaDaChave(k)===id).length};
- p.innerHTML=`<div class="pk"><header class="pkh">${sqlito(evo(),'happy')}<div><h1>${forcado?`Olá, ${esc((S.aluno||{}).apelido||'aluno')}! Onde vamos treinar SQL?`:'Trocar de trilha'}</h1><p>Eu sou o SQLito, o Mestre dos Dados (pode me chamar de Seu Queri). O SQL Server que você aprende é o mesmo em todas as trilhas: 23 etapas, 230 lições e 4 certificados. Muda o banco de dados dos exercícios.</p><span class="bd2">${FRASE.bordao}</span></div></header>
+ p.innerHTML=`<div class="pk"><header class="pkh">${sqlito(evo(),'happy')}<div><h1>${forcado?`Olá, ${esc((S.aluno||{}).apelido||'aluno')}! Onde vamos treinar SQL?`:'Trocar de trilha'}</h1><p>Eu sou o SQLito, o Mestre dos Dados (pode me chamar de Seu Queri). O SQL Server que você aprende é o mesmo nas trilhas completas: 23 etapas, 230 lições e 4 certificados. Muda o banco de dados dos exercícios. As trilhas especiais são mais curtas: Power BI (8 etapas) e Databricks (12 etapas, no SQL do Databricks).</p><span class="bd2">${FRASE.bordao}</span></div></header>
  <div class="tgrid">${TRILHAS_INFO.map(T=>{const f=feitas(T.id);return `<button class="tri ${T.id===S.trilha?'cur':''}" data-tri="${T.id}" style="--tc:${T.c};--td:${T.d}"><span class="ti">${ic(T.ic)}</span><h3>${T.nome}</h3><span class="sb">${T.sub}</span><p>${T.desc}</p><code>${T.tabs}</code><div class="mt" role="progressbar" aria-label="Lições concluídas em ${T.nome}" aria-valuenow="${f}" aria-valuemax="${ntDe(T.id)*NL}"><i style="width:${f/(ntDe(T.id)*NL)*100}%"></i></div>${T.rec?`<small class="rec">${T.rec}</small>`:''}<span class="go">${T.id===S.trilha?'Trilha atual':f?'Continuar':'Começar aqui'} <small>${f}/${ntDe(T.id)*NL} lições</small></span></button>`}).join('')}</div>
  <div class="pkf"><p>Você pode trocar quando quiser no Perfil. O progresso, as provas e os certificados de cada trilha ficam guardados.</p>${forcado?'':'<button class="btn ghost" id="pkX">Voltar</button>'}</div></div>`;
  p.classList.add('on');document.body.style.overflow='hidden';p.scrollTop=0;
@@ -1985,7 +1997,7 @@ function viewCert(){
 }
 function bindCert(){document.querySelectorAll('[data-prova]').forEach(b=>b.onclick=()=>startProva(+b.dataset.prova));document.querySelectorAll('[data-cert]').forEach(b=>b.onclick=()=>showCert((S.certs||[]).find(c=>c.nivel_id===+b.dataset.cert&&(c.trilha||'hotel')===S.trilha)))}
 function startProva(n){
- const N=NIVEIS[n-1],pools=[];for(let e=N.et[0];e<=N.et[1];e++)pools.push(shuffle(UNITS[e-1].L.flatMap(l=>l.q)));
+ const N=NV(n,S.trilha),pools=[];for(let e=N.et[0];e<=N.et[1];e++)pools.push(shuffle(UNITS[e-1].L.flatMap(l=>l.q)));
  const sel=[];for(let k=0;sel.length<N.q&&k<1000;k++){const p=pools[k%pools.length];if(p.length)sel.push(p.pop())}
  const qs=shuffle(sel);
  L={mode:'prova',nivel:n,trilha:S.trilha,ui:N.et[0]-1,li:0,key:'prova-'+n,les:{t:'Prova Nível '+N.nome,q:qs},queue:qs.map((_,i)=>i),done:0,total:qs.length,step:'intro',ok:0,bad:0,combo:0,gain:0,t0:Date.now(),cid:uuid()};
@@ -1994,7 +2006,7 @@ function startProva(n){
  foot('','','Começar a prova');lb().scrollTop=0;
 }
 async function finishProva(){
- L.step='enviando';const N=NIVEIS[L.nivel-1],sec=Math.round((Date.now()-L.t0)/1000);bar();
+ L.step='enviando';const N=NV(L.nivel,L.trilha||S.trilha),sec=Math.round((Date.now()-L.t0)/1000);bar();
  lb().innerHTML=`<div class="fin">${sqlito(evo(),'idle')}<h2 style="color:var(--ink)">Corrigindo sua prova…</h2></div>`;foot('','','Aguarde',true);
  try{L.result=await API.req('POST','provas',{client_id:L.cid,trilha:L.trilha,nivel:L.nivel,acertos:L.ok,total:L.total,duracao_s:sec})}
  catch(e){if(e.status===401){sessaoExpirada();return}if(!L)return;L.step='reenviar';lb().innerHTML=`<div class="fin">${sqlito(evo(),'sad')}<h2 style="color:var(--bad-ink)">Não consegui enviar</h2><p>${esc(e.message)}</p><p class="mute">Suas respostas estão guardadas. Confira a conexão e ${clq} para enviar de novo.</p></div>`;foot('','','Enviar de novo');return}
@@ -2005,7 +2017,7 @@ async function finishProva(){
  sincronizar();
 }
 function showCert(c){
- if(!c)return;const N=NIVEIS[c.nivel_id-1],box=$('#cert'),onl=API.mode==='api',T=TRI(c.trilha||'hotel'),et=c.etapas_texto||etapasDe(T.id,N);
+ if(!c)return;const N=NV(c.nivel_id,c.trilha||'hotel'),box=$('#cert'),onl=API.mode==='api',T=TRI(c.trilha||'hotel'),et=c.etapas_texto||etapasDe(T.id,N);
  const pdf=onl?`${BASE}/api/certificados/${encodeURIComponent(c.codigo)}/pdf`:null,link=onl?`${BASE||location.origin}/certificado/${encodeURIComponent(c.codigo)}`:null;
  box.innerHTML=`<div class="cwrap"><div class="cbar ctop"><button class="btn ghost" id="cX">${ic('x')}Fechar</button></div>
  <article class="cert" style="--lc:${N.c}" aria-label="Certificado do Nível ${N.nome}">
